@@ -12,6 +12,7 @@ namespace HTTPServer
         {
             // TODO: Create log file named log.txt to log exception details in it
             // for each exception write its details associated with datetime 
+            File.WriteAllText("log.txt",DateTime.Now.ToString() +" : "+ ex.Message);
         }
     }
 }
