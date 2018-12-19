@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace HTTPServer
 {
@@ -25,7 +26,7 @@ namespace HTTPServer
         int index = 0;
         RequestMethod method;
         public string relativeURI;
-        Dictionary<string, string> headerLines;
+        public Dictionary<string, string> headerLines;
 
         public Dictionary<string, string> HeaderLines
         {
@@ -39,6 +40,7 @@ namespace HTTPServer
         public Request(string requestString)
         {
             this.requestString = requestString;
+            headerLines = new Dictionary<string, string>();
         }
         /// <summary>
         /// Parses the request string and loads the request line, header lines and content, returns false if there is a parsing error
@@ -46,9 +48,10 @@ namespace HTTPServer
         /// <returns>True if parsing succeeds, false otherwise.</returns>
         public bool ParseRequest()
         {
-            string[] separatingChars = { "\r\n" };
+            //string[] separatingChars = { "\r\n" };
             //TODO: parse the receivedRequest using the \r\n delimeter   
-            this.contentLines = requestString.Split(separatingChars, System.StringSplitOptions.RemoveEmptyEntries);
+            //this.contentLines = requestString.Split(separatingChars, System.StringSplitOptions.RemoveEmptyEntries);
+            this.contentLines = Regex.Split(requestString, "\r\n");
             // check that there is atleast 3 lines: Request line, Host Header, Blank line (usually 4 lines with the last empty line for empty content)
             if (this.contentLines.Length < 3)
                 return false;
@@ -87,15 +90,15 @@ namespace HTTPServer
             {
                 return false;
             }
-            if (requestLines[2] == " HTTP1.0")
+            if (requestLines[2] == " HTTP/1.0")
             {
                 httpVersion = HTTPVersion.HTTP10;
             }
-            else if (requestLines[2] == "HTTP1.1")
+            else if (requestLines[2] == "HTTP/1.1")
             {
                 httpVersion = HTTPVersion.HTTP11;
             }
-            else if (requestLines[2] == "HTTP0.9")
+            else if (requestLines[2] == "HTTP/0.9")
             {
                 httpVersion = HTTPVersion.HTTP09;
             }
@@ -103,7 +106,8 @@ namespace HTTPServer
             {
                 return false;
             }
-            if (ValidateIsURI(relativeURI) == false)
+            //if (ValidateIsURI(relativeURI) == false)
+            if (ValidateIsURI(requestLines[1]) == false)
             {
                 return false;
             }
@@ -126,7 +130,7 @@ namespace HTTPServer
             {
 
                 string[] bu = contentLines[i].Split(':');
-                HeaderLines.Add(bu[0], bu[1]);
+                headerLines.Add(bu[0], bu[1]);
             }
             return true;
         }

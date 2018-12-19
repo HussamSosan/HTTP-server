@@ -16,6 +16,7 @@ namespace HTTPServer
         public Server(int portNumber, string redirectionMatrixPath)
         {
             //TODO: call this.LoadRedirectionRules passing redirectionMatrixPath to it
+            Configuration.RedirectionRules = new Dictionary<string, string>();
             this.LoadRedirectionRules(redirectionMatrixPath);
 
             //TODO: initialize this.serverSocket
@@ -99,9 +100,9 @@ namespace HTTPServer
                 if (t == true)
                 {
                     //TODO: map the relativeURI in request to get the physical path of the resource.
-                    string pass = Configuration.RootPath + request.relativeURI;
+                    string pass = Configuration.RootPath + '\\' +request.relativeURI.Remove(0,1);
                     //TODO: check for redirect
-                    string loc = GetRedirectionPagePathIFExist(request.relativeURI);
+                    string loc = GetRedirectionPagePathIFExist(request.relativeURI.Remove(0,1));
                     if (loc != string.Empty)
                     {
                         c = StatusCode.Redirect;
@@ -109,7 +110,8 @@ namespace HTTPServer
                     }
                     else
                     {
-                        loc = request.relativeURI;
+                        //loc = request.relativeURI;
+                        loc = pass;
                     }
                     //TODO: check file exists
                     //TODO: read the physical file
@@ -183,7 +185,11 @@ namespace HTTPServer
             try
             {
                 // TODO: using the filepath paramter read the redirection rules from file 
-
+                string [] data = File.ReadAllLines(filePath);
+                foreach (string item in data)
+                {
+                    Configuration.RedirectionRules.Add(item.Split(',')[0], item.Split(',')[1]);
+                }
                 // then fill Configuration.RedirectionRules dictionary 
             }
             catch (Exception ex)

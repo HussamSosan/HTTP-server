@@ -25,7 +25,10 @@ namespace HTTPServer
             // each line in the file specify a redirection rule
             // example: "aboutus.html,aboutus2.html"
             // means that when making request to aboustus.html,, it redirects me to aboutus2
-            File.WriteAllText("redirectionRules.txt","aboutus.html,aboutus2.html");
+            string data = "aboutus.html,aboutus2.html\n";
+            data += "mypage.html,mypage2.html\n";
+            data += "redirectme.html,redirectme2.html\n";
+            File.WriteAllText("redirectionRules.txt",data);
         }
          
     }
